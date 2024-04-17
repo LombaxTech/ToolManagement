@@ -15,7 +15,7 @@ export default function AdminHome() {
 
   useEffect(() => {
     const init = async () => {
-      let q = query(collection(db, "logs"), orderBy("date", "asc"));
+      let q = query(collection(db, "logs"), orderBy("borrowDate", "asc"));
 
       onSnapshot(q, (snapshot) => {
         let logs: any = [];
@@ -48,8 +48,9 @@ export default function AdminHome() {
         <tbody>
           {logs &&
             logs.map((log: any) => {
-              const isBorrow = log.action == "borrow";
               const isAvailable = log.status === "Available";
+
+              const isReturned = isAvailable && log.returnDate;
 
               return (
                 <tr key={log.id}>
@@ -58,8 +59,10 @@ export default function AdminHome() {
                     {log.tool.name} ({log.tool.id})
                   </td>
 
-                  <td>{isBorrow ? formatDate(log.date.toDate()) : ""}</td>
-                  <td>{isBorrow ? "" : formatDate(log.date.toDate())}</td>
+                  <td>{formatDate(log.borrowDate.toDate())}</td>
+                  <td>
+                    {isReturned ? formatDate(log.returnDate.toDate()) : ""}
+                  </td>
                   <td
                     className={`${
                       isAvailable ? "text-green-500" : "text-red-500"

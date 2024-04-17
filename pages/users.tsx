@@ -6,6 +6,8 @@ import {
   doc,
   getDocs,
   onSnapshot,
+  orderBy,
+  query,
   updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
@@ -21,6 +23,25 @@ export default function Users() {
   const [success, setSuccess] = useState<any>(false);
 
   const [foundUser, setFoundUser] = useState<any>(null);
+
+  const [logs, setLogs] = useState<any>([]);
+
+  useEffect(() => {
+    const init = async () => {
+      let q = query(collection(db, "logs"), orderBy("borrowDate", "asc"));
+
+      onSnapshot(q, (snapshot) => {
+        let logs: any = [];
+        snapshot.forEach((doc) => logs.push({ id: doc.id, ...doc.data() }));
+        setLogs(logs);
+      });
+
+      //   let snapshot = await getDocs(collection(db, "logs"));
+      // let snapshot = await getDocs(q);
+    };
+
+    init();
+  }, []);
 
   const [tools, setTools] = useState<any>([]);
 
@@ -66,9 +87,9 @@ export default function Users() {
     try {
       const newLog = {
         user: foundUser,
-        date: new Date(),
+        borrowDate: new Date(),
         tool,
-        action: "borrow",
+        status: "Unavailable",
       };
 
       await addDoc(collection(db, "logs"), newLog);
@@ -90,17 +111,25 @@ export default function Users() {
 
     let tool = tools.find((t: any) => t?.id == toolId);
 
+    let logToUpdate = logs.find(
+      (log: any) => log.tool.id === tool.id && log.status === "Unavailable"
+    );
+
     if (tool.available) return setError("Tool is not being borrowed");
 
     try {
-      const newLog = {
-        user: foundUser,
-        date: new Date(),
-        tool,
+      const updatedLog = {
         action: "return",
+        status: "Available",
+        returnDate: new Date(),
       };
 
-      await addDoc(collection(db, "logs"), newLog);
+      let logToUpdate = logs.find(
+        (log: any) => log.tool.id === tool.id && log.status === "Unavailable"
+      );
+
+      let logDocRef = doc(db, "logs", logToUpdate.id);
+      await updateDoc(logDocRef, updatedLog);
 
       // MAKE TOOL UNAVAILABLE
       await updateDoc(doc(db, "tools", tool.docId), { available: true });
