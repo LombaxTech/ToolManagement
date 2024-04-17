@@ -1,8 +1,15 @@
-import { tools, users } from "@/data";
+import { users } from "@/data";
 import { db } from "@/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Users() {
   const router = useRouter();
@@ -14,6 +21,28 @@ export default function Users() {
   const [success, setSuccess] = useState<any>(false);
 
   const [foundUser, setFoundUser] = useState<any>(null);
+
+  const [tools, setTools] = useState<any>([]);
+
+  useEffect(() => {
+    const init = async () => {
+      onSnapshot(collection(db, "tools"), (snapshot) => {
+        let tools: any = [];
+
+        snapshot.forEach((doc) =>
+          tools.push({
+            docId: doc.id,
+            ...doc.data(),
+          })
+        );
+        setTools(tools);
+      });
+
+      // let snapshot = await getDocs(collection(db, "tools"));
+    };
+
+    init();
+  }, []);
 
   const findUser = () => {
     setError(false);
@@ -29,11 +58,12 @@ export default function Users() {
 
   const borrowTool = async () => {
     setSuccess(false);
+    setError(false);
+
+    let tool = tools.find((t: any) => t.id == toolId);
+    if (!tool.available) return setError("Tool is being borrowed");
 
     try {
-      // @ts-ignore
-      let tool = tools.find((t) => t.id == toolId);
-
       const newLog = {
         user: foundUser,
         date: new Date(),
@@ -42,6 +72,9 @@ export default function Users() {
       };
 
       await addDoc(collection(db, "logs"), newLog);
+
+      // MAKE TOOL UNAVAILABLE
+      await updateDoc(doc(db, "tools", tool.docId), { available: false });
 
       const successMessage = `${foundUser.name} (${foundUser.id}) borrowed the ${tool?.name} (${tool?.id})`;
       setSuccess(successMessage);
@@ -53,11 +86,13 @@ export default function Users() {
 
   const returnTool = async () => {
     setSuccess(false);
+    setError(false);
+
+    let tool = tools.find((t: any) => t?.id == toolId);
+
+    if (tool.available) return setError("Tool is not being borrowed");
 
     try {
-      // @ts-ignore
-      let tool = tools.find((t) => t.id == toolId);
-
       const newLog = {
         user: foundUser,
         date: new Date(),
@@ -66,6 +101,9 @@ export default function Users() {
       };
 
       await addDoc(collection(db, "logs"), newLog);
+
+      // MAKE TOOL UNAVAILABLE
+      await updateDoc(doc(db, "tools", tool.docId), { available: true });
 
       const successMessage = `${foundUser.name} (${foundUser.id}) returned the ${tool?.name} (${tool?.id})`;
       setSuccess(successMessage);
@@ -109,7 +147,7 @@ export default function Users() {
 
           {error && (
             <div className="p-2 bg-red-200 text-red-700 text-center">
-              Invalid User Id
+              {error}
             </div>
           )}
 
