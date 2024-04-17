@@ -28,6 +28,8 @@ export default function Users() {
   };
 
   const borrowTool = async () => {
+    setSuccess(false);
+
     try {
       // @ts-ignore
       let tool = tools.find((t) => t.id == toolId);
@@ -40,18 +42,38 @@ export default function Users() {
       };
 
       await addDoc(collection(db, "logs"), newLog);
+      setSuccess(true);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const returnTool = async () => {};
+  const returnTool = async () => {
+    setSuccess(false);
+
+    try {
+      // @ts-ignore
+      let tool = tools.find((t) => t.id == toolId);
+
+      const newLog = {
+        user: foundUser,
+        date: new Date(),
+        tool,
+        action: "return",
+      };
+
+      await addDoc(collection(db, "logs"), newLog);
+
+      setSuccess(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   if (toolId)
     return (
       <div className="flex flex-col items-center pt-20">
         <div className="p-4 border flex flex-col gap-2">
-          {toolId}
           <input
             type="text"
             className="p-2 border"
@@ -83,6 +105,12 @@ export default function Users() {
           {error && (
             <div className="p-2 bg-red-200 text-red-700 text-center">
               Invalid User Id
+            </div>
+          )}
+
+          {success && (
+            <div className="p-2 bg-green-200 text-green-700 text-center">
+              Success
             </div>
           )}
         </div>
