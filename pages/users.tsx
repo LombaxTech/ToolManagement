@@ -42,7 +42,10 @@ export default function Users() {
       };
 
       await addDoc(collection(db, "logs"), newLog);
-      setSuccess(true);
+
+      const successMessage = `${foundUser.name} (${foundUser.id}) borrowed the ${tool?.name} (${tool?.id})`;
+      setSuccess(successMessage);
+      setFoundUser(null);
     } catch (error) {
       console.log(error);
     }
@@ -64,7 +67,9 @@ export default function Users() {
 
       await addDoc(collection(db, "logs"), newLog);
 
-      setSuccess(true);
+      const successMessage = `${foundUser.name} (${foundUser.id}) returned the ${tool?.name} (${tool?.id})`;
+      setSuccess(successMessage);
+      setFoundUser(null);
     } catch (error) {
       console.log(error);
     }
@@ -110,7 +115,7 @@ export default function Users() {
 
           {success && (
             <div className="p-2 bg-green-200 text-green-700 text-center">
-              Success
+              {success}
             </div>
           )}
         </div>
