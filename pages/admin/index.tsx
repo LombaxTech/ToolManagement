@@ -1,6 +1,13 @@
 import { db } from "@/firebase";
 import { formatDate } from "@/helperFunctions";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 
 export default function AdminHome() {
@@ -8,14 +15,16 @@ export default function AdminHome() {
 
   useEffect(() => {
     const init = async () => {
-      let logs: any = [];
-
       let q = query(collection(db, "logs"), orderBy("date", "asc"));
 
+      onSnapshot(q, (snapshot) => {
+        let logs: any = [];
+        snapshot.forEach((doc) => logs.push({ id: doc.id, ...doc.data() }));
+        setLogs(logs);
+      });
+
       //   let snapshot = await getDocs(collection(db, "logs"));
-      let snapshot = await getDocs(q);
-      snapshot.forEach((doc) => logs.push({ id: doc.id, ...doc.data() }));
-      setLogs(logs);
+      // let snapshot = await getDocs(q);
     };
 
     init();
@@ -40,6 +49,7 @@ export default function AdminHome() {
           {logs &&
             logs.map((log: any) => {
               const isBorrow = log.action == "borrow";
+              const isAvailable = log.status === "Available";
 
               return (
                 <tr key={log.id}>
@@ -50,8 +60,14 @@ export default function AdminHome() {
 
                   <td>{isBorrow ? formatDate(log.date.toDate()) : ""}</td>
                   <td>{isBorrow ? "" : formatDate(log.date.toDate())}</td>
-                  <td>
-                    {log.action === "borrow" ? "Not available" : "Available"}
+                  <td
+                    className={`${
+                      isAvailable ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {/* {log.action === "borrow" ? "Not available" : "Available"} */}
+
+                    {isAvailable ? "Available" : "Not Available"}
                   </td>
                 </tr>
               );
