@@ -21,3 +21,51 @@ export function formatDate(date: Date): string {
   // Also include the time in 12-hour format with AM/PM
   return `${month}/${day}/${year} ${hours12}:${minutes}${meridiem}`;
 }
+
+export function calculateDeadline(
+  startDate: Date,
+  timeLimitHours: number
+): Date {
+  // Convert time limit to milliseconds
+  const timeLimitMs = timeLimitHours * 60 * 60 * 1000;
+
+  // Calculate deadline by adding time limit to start date
+  const deadline = new Date(startDate.getTime() + timeLimitMs);
+
+  return deadline;
+}
+
+// Example usage
+// const startDate = new Date(); // Current date and time
+// const timeLimitHours = 6; // 6 hours time limit
+
+// const deadline = calculateDeadline(startDate, timeLimitHours);
+// console.log(deadline); // Output the calculated deadline
+
+export function calculateTimeSpent(startTime: Date): number {
+  // Get the current time
+  const currentTime = new Date();
+
+  // Calculate the difference in milliseconds between the current time and the start time
+  const timeDifferenceMs = currentTime.getTime() - startTime.getTime();
+
+  // Convert the time difference from milliseconds to hours
+  const timeSpentHours = parseFloat(
+    (timeDifferenceMs / (1000 * 60 * 60)).toFixed(1)
+  );
+
+  return timeSpentHours;
+}
+
+export function calculateRemainingTime(
+  startTime: Date,
+  timeLimitHours: number
+): number {
+  // Calculate the time spent
+  const timeSpentHours = calculateTimeSpent(startTime);
+
+  // Calculate the remaining time by subtracting time spent from the total time limit
+  const remainingTime = timeLimitHours - timeSpentHours;
+
+  return remainingTime;
+}
