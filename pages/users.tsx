@@ -233,7 +233,7 @@ export default function Users() {
                     let isOverdue = checkIfOverdue(startDate, toolTimeLimit);
 
                     return (
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1" key={log.id}>
                         <span className="">
                           You have borrowed tool id {log.tool.id}
                         </span>
@@ -254,7 +254,7 @@ export default function Users() {
                 {returnedLogs &&
                   returnedLogs.map((log: any) => {
                     return (
-                      <span className="">
+                      <span className="" key={log.id}>
                         You have borrowed tool id {log.tool.id}
                       </span>
                     );
