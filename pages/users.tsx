@@ -1,6 +1,12 @@
 import { users } from "@/data";
 import { db } from "@/firebase";
 import {
+  calculateDeadline,
+  calculateRemainingTime,
+  calculateTimeSpent,
+  checkIfOverdue,
+} from "@/helperFunctions";
+import {
   addDoc,
   collection,
   doc,
@@ -214,19 +220,34 @@ export default function Users() {
             <div className="flex flex-col gap-2 mt-4">
               <h1 className="text-lg">Borrow History</h1>
 
+              {/* NOT RETURNED LOGS */}
               <div className="flex flex-col gap-1">
                 <span className="underline">Still not returned</span>
 
                 {notReturnedUserLogs &&
                   notReturnedUserLogs.map((log: any) => {
+                    // CHECK IF RETURN IS OVERDUE
+
+                    let startDate = log.borrowDate.toDate();
+                    let toolTimeLimit = log.tool.timeLimit || 5;
+                    let isOverdue = checkIfOverdue(startDate, toolTimeLimit);
+
                     return (
-                      <span className="">
-                        You have borrowed tool id {log.tool.id}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className="">
+                          You have borrowed tool id {log.tool.id}
+                        </span>
+                        {isOverdue && (
+                          <span className="bg-red-200 text-red-600">
+                            This is overdue
+                          </span>
+                        )}
+                      </div>
                     );
                   })}
               </div>
 
+              {/* RETURNED LOGS */}
               <div className="flex flex-col gap-1">
                 <span className="underline">Returned</span>
 

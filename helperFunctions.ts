@@ -69,3 +69,16 @@ export function calculateRemainingTime(
 
   return remainingTime;
 }
+
+export function checkIfOverdue(
+  startDate: Date,
+  timeLimitHours: number
+): boolean {
+  // Calculate the deadline
+  const deadline = calculateDeadline(startDate, timeLimitHours);
+
+  // Check if the current time is after the deadline
+  const overdue = new Date() > deadline;
+
+  return overdue;
+}
