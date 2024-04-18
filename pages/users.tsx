@@ -142,7 +142,31 @@ export default function Users() {
     }
   };
 
-  if (toolId)
+  if (toolId) {
+    // GET LOGS FOR FOUND USER
+    let notReturnedUserLogs: any = [];
+    let returnedLogs: any = [];
+
+    if (foundUser && logs.length > 0) {
+      logs.forEach((log: any) => {
+        if (
+          log.user.id == foundUser.id &&
+          !log.returnDate &&
+          log.status == "Unavailable"
+        ) {
+          notReturnedUserLogs.push(log);
+        }
+
+        if (
+          log.user.id == foundUser.id &&
+          log.returnDate &&
+          log.status == "Available"
+        ) {
+          returnedLogs.push(log);
+        }
+      });
+    }
+
     return (
       <div className="flex flex-col items-center pt-20">
         <div className="p-4 border flex flex-col gap-2">
@@ -185,7 +209,40 @@ export default function Users() {
               {success}
             </div>
           )}
+
+          {foundUser && (
+            <div className="flex flex-col gap-2 mt-4">
+              <h1 className="text-lg">Borrow History</h1>
+
+              <div className="flex flex-col gap-1">
+                <span className="underline">Still not returned</span>
+
+                {notReturnedUserLogs &&
+                  notReturnedUserLogs.map((log: any) => {
+                    return (
+                      <span className="">
+                        You have borrowed tool id {log.tool.id}
+                      </span>
+                    );
+                  })}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="underline">Returned</span>
+
+                {returnedLogs &&
+                  returnedLogs.map((log: any) => {
+                    return (
+                      <span className="">
+                        You have borrowed tool id {log.tool.id}
+                      </span>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
+  }
 }
