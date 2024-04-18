@@ -1,5 +1,10 @@
 import { db } from "@/firebase";
-import { formatDate } from "@/helperFunctions";
+import {
+  calculateDeadline,
+  calculateRemainingTime,
+  calculateTimeSpent,
+  formatDate,
+} from "@/helperFunctions";
 import {
   collection,
   getDocs,
@@ -42,6 +47,8 @@ export default function AdminHome() {
             <th>Tool (id)</th>
             <th>Borrow Time</th>
             <th>Return Time</th>
+            <th>Remaining</th>
+            <th>Spent Time</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -51,6 +58,16 @@ export default function AdminHome() {
               const isAvailable = log.status === "Available";
 
               const isReturned = isAvailable && log.returnDate;
+
+              // GET REMAINING TIME
+              let startDate = log.borrowDate.toDate();
+              let toolTimeLimit = log.tool.timeLimit || 5;
+              let deadline = calculateDeadline(startDate, toolTimeLimit);
+              let timeSpent = calculateTimeSpent(startDate);
+              let remainingTime = calculateRemainingTime(
+                startDate,
+                toolTimeLimit
+              );
 
               return (
                 <tr key={log.id}>
@@ -63,6 +80,12 @@ export default function AdminHome() {
                   <td>
                     {isReturned ? formatDate(log.returnDate.toDate()) : ""}
                   </td>
+                  {/* REMAINING TIME  -- hours left of limit */}
+                  <td>
+                    {remainingTime} hours left of {toolTimeLimit} hours
+                  </td>
+                  {/* SPENT TIME */}
+                  <td>{timeSpent} hours </td>
                   <td
                     className={`${
                       isAvailable ? "text-green-500" : "text-red-500"
