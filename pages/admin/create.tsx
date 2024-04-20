@@ -1,3 +1,4 @@
+import { AuthContext } from "@/context/AuthContext";
 import { users } from "@/data";
 import { db } from "@/firebase";
 import { timeEnd } from "console";
@@ -13,7 +14,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 export default function AdminCreatePage() {
   return (
@@ -27,6 +28,8 @@ export default function AdminCreatePage() {
 }
 
 const CreateTool = () => {
+  const { user } = useContext(AuthContext);
+
   const [tools, setTools] = useState<any>([]);
 
   useEffect(() => {
@@ -87,7 +90,16 @@ const CreateTool = () => {
     }
   }, [tools, toolId, toolName]);
 
-  if (tools)
+  if (!user)
+    return (
+      <div className="flex justify-center items-center pt-10">
+        <h1 className="text-2xl font-bold">
+          You must be signed in to view this page
+        </h1>
+      </div>
+    );
+
+  if (user && tools)
     return (
       <div className="p-4 border flex flex-col gap-2">
         <h1 className="text-xl font-medium">Create Tool</h1>
