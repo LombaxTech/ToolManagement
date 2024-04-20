@@ -4,16 +4,13 @@ import {
   calculateRemainingTime,
   calculateTimeSpent,
   formatDate,
+  isToday,
+  isYesterday,
 } from "@/helperFunctions";
-import {
-  collection,
-  getDocs,
-  onSnapshot,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
+
+const dateValues = ["Today", "Yesterday", "All Time"];
 
 export default function AdminHome() {
   const [logs, setLogs] = useState<any>([]);
@@ -35,9 +32,26 @@ export default function AdminHome() {
     init();
   }, []);
 
+  const [selectedDate, setSelectedDate] = useState(dateValues[0]);
+
   return (
     <div className="p-4 flex flex-col gap-2">
-      <h1 className="text-2xl font-bold">LIVE LOGS</h1>
+      <div className="flex items-center gap-4 mb-10">
+        <h1 className="text-2xl font-bold">LIVE LOGS</h1>
+
+        {/* FILTER */}
+        <div className="">
+          <select
+            className="border p-2 border-black"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          >
+            {dateValues.map((date) => {
+              return <option key={date}>{date}</option>;
+            })}
+          </select>
+        </div>
+      </div>
 
       <table className="table">
         {/* head */}
@@ -68,6 +82,13 @@ export default function AdminHome() {
                 startDate,
                 toolTimeLimit
               );
+
+              // IF SELECTED DATE IS TODAY && LOG DATE IS NOT TODAY RETURN NULL
+              if (selectedDate === "Today" && !isToday(startDate)) return null;
+              // IF SELECTED DATE IS YESTERDAY && LOG DATE IS NOT YESTERDAY RETURN NULL
+              if (selectedDate === "Yesterday" && !isYesterday(startDate))
+                return null;
+              // IF SELECTED DATE IS ALL TIME && THEN ALLOW
 
               return (
                 <tr key={log.id}>

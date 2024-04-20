@@ -82,3 +82,31 @@ export function checkIfOverdue(
 
   return overdue;
 }
+
+export function isToday(date: Date): boolean {
+  // Get the current date
+  const currentDate = new Date();
+
+  // Compare the year, month, and day of the given date and the current date
+  return (
+    date.getFullYear() === currentDate.getFullYear() &&
+    date.getMonth() === currentDate.getMonth() &&
+    date.getDate() === currentDate.getDate()
+  );
+}
+
+export function isYesterday(date: Date): boolean {
+  // Get the current date
+  const currentDate = new Date();
+
+  // Get yesterday's date by subtracting one day from the current date
+  const yesterdayDate = new Date(currentDate);
+  yesterdayDate.setDate(currentDate.getDate() - 1);
+
+  // Compare the year, month, and day of the given date and yesterday's date
+  return (
+    date.getFullYear() === yesterdayDate.getFullYear() &&
+    date.getMonth() === yesterdayDate.getMonth() &&
+    date.getDate() === yesterdayDate.getDate()
+  );
+}
