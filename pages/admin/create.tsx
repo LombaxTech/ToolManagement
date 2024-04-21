@@ -17,6 +17,17 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 
 export default function AdminCreatePage() {
+  const { user } = useContext(AuthContext);
+
+  if (!user)
+    return (
+      <div className="flex justify-center items-center pt-10">
+        <h1 className="text-2xl font-bold">
+          You must be signed in to view this page
+        </h1>
+      </div>
+    );
+
   return (
     <div className="flex justify-center gap-8 items-center pt-20">
       {/* CREATE TOOL */}
@@ -28,8 +39,6 @@ export default function AdminCreatePage() {
 }
 
 const CreateTool = () => {
-  const { user } = useContext(AuthContext);
-
   const [tools, setTools] = useState<any>([]);
 
   useEffect(() => {
@@ -90,16 +99,7 @@ const CreateTool = () => {
     }
   }, [tools, toolId, toolName]);
 
-  if (!user)
-    return (
-      <div className="flex justify-center items-center pt-10">
-        <h1 className="text-2xl font-bold">
-          You must be signed in to view this page
-        </h1>
-      </div>
-    );
-
-  if (user && tools)
+  if (tools)
     return (
       <div className="p-4 border flex flex-col gap-2">
         <h1 className="text-xl font-medium">Create Tool</h1>
