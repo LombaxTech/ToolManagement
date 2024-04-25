@@ -1,11 +1,5 @@
-import { users } from "@/data";
 import { db } from "@/firebase";
-import {
-  calculateDeadline,
-  calculateRemainingTime,
-  calculateTimeSpent,
-  checkIfOverdue,
-} from "@/helperFunctions";
+import { checkIfOverdue } from "@/helperFunctions";
 import {
   addDoc,
   collection,
@@ -17,7 +11,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Users() {
   const router = useRouter();
@@ -31,6 +25,21 @@ export default function Users() {
   const [foundUser, setFoundUser] = useState<any>(null);
 
   const [logs, setLogs] = useState<any>([]);
+
+  const [users, setUsers] = useState<any>([]);
+
+  useEffect(() => {
+    const init = async () => {
+      let users: any = [];
+      let snapshot = await getDocs(collection(db, "users"));
+      snapshot.forEach((doc) => users.push({ ...doc.data() }));
+      users.sort(function (a: any, b: any) {
+        return a.id - b.id;
+      });
+      setUsers(users);
+    };
+    init();
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -75,7 +84,7 @@ export default function Users() {
     setError(false);
     setFoundUser(null);
 
-    let foundUser = users.find((u) => u.id == userId);
+    let foundUser = users.find((u: any) => u.id == userId);
     if (!foundUser) {
       return setError("User does not exist");
     }
@@ -173,97 +182,98 @@ export default function Users() {
       });
     }
 
-    return (
-      <div className="flex flex-col items-center pt-20">
-        <div className="p-4 border flex flex-col gap-2">
-          <input
-            type="text"
-            className="p-2 border"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            placeholder="Enter Your ID"
-          />
-          <button className="btn btn-primary" onClick={findUser}>
-            Find user
-          </button>
+    if (users)
+      return (
+        <div className="flex flex-col items-center pt-20">
+          <div className="p-4 border flex flex-col gap-2">
+            <input
+              type="text"
+              className="p-2 border"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              placeholder="Enter Your ID"
+            />
+            <button className="btn btn-primary" onClick={findUser}>
+              Find user
+            </button>
 
-          {foundUser && (
-            <div className="flex gap-2">
-              <button
-                className="flex-1 btn btn-sm btn-outline"
-                onClick={borrowTool}
-              >
-                Borrow
-              </button>
-              <button
-                className="flex-1 btn btn-sm btn-secondary"
-                onClick={returnTool}
-              >
-                Return
-              </button>
-            </div>
-          )}
+            {foundUser && (
+              <div className="flex gap-2">
+                <button
+                  className="flex-1 btn btn-sm btn-outline"
+                  onClick={borrowTool}
+                >
+                  Borrow
+                </button>
+                <button
+                  className="flex-1 btn btn-sm btn-secondary"
+                  onClick={returnTool}
+                >
+                  Return
+                </button>
+              </div>
+            )}
 
-          {error && (
-            <div className="p-2 bg-red-200 text-red-700 text-center">
-              {error}
-            </div>
-          )}
+            {error && (
+              <div className="p-2 bg-red-200 text-red-700 text-center">
+                {error}
+              </div>
+            )}
 
-          {success && (
-            <div className="p-2 bg-green-200 text-green-700 text-center">
-              {success}
-            </div>
-          )}
+            {success && (
+              <div className="p-2 bg-green-200 text-green-700 text-center">
+                {success}
+              </div>
+            )}
 
-          {foundUser && (
-            <div className="flex flex-col gap-2 mt-4">
-              <h1 className="text-lg">Borrow History</h1>
+            {foundUser && (
+              <div className="flex flex-col gap-2 mt-4">
+                <h1 className="text-lg">Borrow History</h1>
 
-              {/* NOT RETURNED LOGS */}
-              <div className="flex flex-col gap-1">
-                <span className="underline">Still not returned</span>
+                {/* NOT RETURNED LOGS */}
+                <div className="flex flex-col gap-1">
+                  <span className="underline">Still not returned</span>
 
-                {notReturnedUserLogs &&
-                  notReturnedUserLogs.map((log: any) => {
-                    // CHECK IF RETURN IS OVERDUE
+                  {notReturnedUserLogs &&
+                    notReturnedUserLogs.map((log: any) => {
+                      // CHECK IF RETURN IS OVERDUE
 
-                    let startDate = log.borrowDate.toDate();
-                    let toolTimeLimit = log.tool.timeLimit || 5;
-                    let isOverdue = checkIfOverdue(startDate, toolTimeLimit);
+                      let startDate = log.borrowDate.toDate();
+                      let toolTimeLimit = log.tool.timeLimit || 5;
+                      let isOverdue = checkIfOverdue(startDate, toolTimeLimit);
 
-                    return (
-                      <div className="flex flex-col gap-1" key={log.id}>
-                        <span className="">
+                      return (
+                        <div className="flex flex-col gap-1" key={log.id}>
+                          <span className="">
+                            You have borrowed tool id {log.tool.id}
+                          </span>
+                          {isOverdue && (
+                            <span className="bg-red-200 text-red-600">
+                              This is overdue
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+
+                {/* RETURNED LOGS */}
+                <div className="flex flex-col gap-1">
+                  <span className="underline">Returned</span>
+
+                  {returnedLogs &&
+                    returnedLogs.map((log: any) => {
+                      return (
+                        <span className="" key={log.id}>
                           You have borrowed tool id {log.tool.id}
                         </span>
-                        {isOverdue && (
-                          <span className="bg-red-200 text-red-600">
-                            This is overdue
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                </div>
               </div>
-
-              {/* RETURNED LOGS */}
-              <div className="flex flex-col gap-1">
-                <span className="underline">Returned</span>
-
-                {returnedLogs &&
-                  returnedLogs.map((log: any) => {
-                    return (
-                      <span className="" key={log.id}>
-                        You have borrowed tool id {log.tool.id}
-                      </span>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
-    );
+      );
   }
 }

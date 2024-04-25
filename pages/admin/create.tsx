@@ -1,20 +1,7 @@
 import { AuthContext } from "@/context/AuthContext";
-import { users } from "@/data";
 import { db } from "@/firebase";
-import { timeEnd } from "console";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
-} from "firebase/firestore";
-import { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
 
 export default function AdminCreatePage() {
   const { user } = useContext(AuthContext);

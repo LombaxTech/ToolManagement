@@ -1,8 +1,7 @@
 import { db } from "@/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-// import { tools } from "@/data";
+import { useEffect, useState } from "react";
 
 export default function Tools() {
   const router = useRouter();
