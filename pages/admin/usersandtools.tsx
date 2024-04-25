@@ -1,8 +1,11 @@
+import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { collection, getDoc, getDocs } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 export default function UsersAndTools() {
+  const { user: authUser } = useContext(AuthContext);
+
   const [users, setUsers] = useState<any>([]);
   const [tools, setTools] = useState<any>([]);
 
@@ -27,6 +30,15 @@ export default function UsersAndTools() {
 
     init();
   }, []);
+
+  if (!authUser)
+    return (
+      <div className="flex justify-center items-center pt-10">
+        <h1 className="text-2xl font-bold">
+          You must be signed in to view this page
+        </h1>
+      </div>
+    );
 
   return (
     <div className="p-4 flex flex-col lg:flex-row w-full lg:gap-0 gap-8">
