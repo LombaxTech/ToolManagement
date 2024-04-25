@@ -56,9 +56,13 @@ export default function Navbar() {
       </h1> */}
       <ul className="flex gap-4 items-end">
         {user && (
-          <li className="cursor-pointer" onClick={signout}>
-            Sign Out
-          </li>
+          <>
+            <Link href={`/admin/create`}>Create</Link>
+
+            <li className="cursor-pointer" onClick={signout}>
+              Sign Out
+            </li>
+          </>
         )}
       </ul>
     </div>
