@@ -4,6 +4,7 @@ import {
   calculateDeadline,
   calculateRemainingTime,
   calculateTimeSpent,
+  checkIfOverdue,
   formatDate,
   isToday,
   isYesterday,
@@ -95,6 +96,7 @@ export default function AdminHome() {
                   startDate,
                   toolTimeLimit
                 );
+                let isOverdue = checkIfOverdue(startDate, toolTimeLimit);
 
                 // IF SELECTED DATE IS TODAY && LOG DATE IS NOT TODAY RETURN NULL
                 if (selectedDate === "Today" && !isToday(startDate))
@@ -117,7 +119,11 @@ export default function AdminHome() {
                     </td>
                     {/* REMAINING TIME  -- hours left of limit */}
                     <td>
-                      {remainingTime} hours left of {toolTimeLimit} hours
+                      {isReturned
+                        ? "Returned"
+                        : isOverdue
+                        ? "Overdue"
+                        : `${remainingTime} hours left of ${toolTimeLimit} hours`}
                     </td>
                     {/* SPENT TIME */}
                     <td>{timeSpent} hours </td>
