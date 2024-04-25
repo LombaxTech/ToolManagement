@@ -91,7 +91,11 @@ export default function AdminHome() {
                 let startDate = log.borrowDate.toDate();
                 let toolTimeLimit = log.tool.timeLimit || 5;
                 let deadline = calculateDeadline(startDate, toolTimeLimit);
-                let timeSpent = calculateTimeSpent(startDate);
+
+                let timeSpent = isReturned
+                  ? calculateTimeSpent(startDate, log.returnDate.toDate())
+                  : calculateTimeSpent(startDate);
+
                 let remainingTime = calculateRemainingTime(
                   startDate,
                   toolTimeLimit

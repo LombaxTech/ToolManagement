@@ -42,12 +42,12 @@ export function calculateDeadline(
 // const deadline = calculateDeadline(startDate, timeLimitHours);
 // console.log(deadline); // Output the calculated deadline
 
-export function calculateTimeSpent(startTime: Date): number {
+export function calculateTimeSpent(startTime: Date, endDate?: Date): number {
   // Get the current time
-  const currentTime = new Date();
+  const endTime = endDate ? endDate : new Date();
 
   // Calculate the difference in milliseconds between the current time and the start time
-  const timeDifferenceMs = currentTime.getTime() - startTime.getTime();
+  const timeDifferenceMs = endTime.getTime() - startTime.getTime();
 
   // Convert the time difference from milliseconds to hours
   const timeSpentHours = parseFloat(
