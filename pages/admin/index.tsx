@@ -49,7 +49,7 @@ export default function AdminHome() {
 
   if (user)
     return (
-      <div className="p-4 flex flex-col gap-2">
+      <div className="p-4 flex flex-col gap-2 overflow-x-auto">
         <div className="flex items-center gap-4 mb-10">
           <h1 className="text-2xl font-bold">LIVE LOGS</h1>
 

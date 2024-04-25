@@ -29,7 +29,7 @@ export default function AdminCreatePage() {
     );
 
   return (
-    <div className="flex justify-center gap-8 items-center pt-20">
+    <div className="flex flex-col lg:flex-row justify-center gap-8 items-center py-20">
       {/* CREATE TOOL */}
       <CreateTool />
       {/* CREATE USER */}
