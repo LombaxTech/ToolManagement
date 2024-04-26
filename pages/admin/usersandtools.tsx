@@ -50,7 +50,7 @@ export default function UsersAndTools() {
           {users &&
             users.map((user: any, i: number) => {
               return (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4" key={i}>
                   {/* ID */}
                   <span className="lg:w-1/12 w-3/12">{user.id}</span>
                   {/* NAME */}
@@ -67,7 +67,7 @@ export default function UsersAndTools() {
           {tools &&
             tools.map((tool: any, i: number) => {
               return (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4" key={i}>
                   {/* ID */}
                   <span className="w-1/12">{tool.id}</span>
                   {/* NAME */}
